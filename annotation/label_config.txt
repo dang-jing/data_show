@@ -1,0 +1,6 @@
+# name: description
+text:文本
+graph:图形
+line:行
+question:单题目
+formula:公式
