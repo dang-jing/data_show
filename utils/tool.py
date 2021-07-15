@@ -4,6 +4,9 @@ import base64
 import json
 from utils.es import ES
 from utils import share
+from utils.splitLabel import splitLabel
+import os
+from pathlib import Path
 
 
 #   读取标注类型数据文本
@@ -100,7 +103,7 @@ def img(index, id):
 
 
 #   根据关键词搜索数据
-def key_word(index,types):
+def key_word(index, types):
     ''' a = [
         {
             "match": {
@@ -133,10 +136,62 @@ def key_word(index,types):
     return share.id_type(match)
 
 
+#   对上传文件进行切分，返回压缩后文件
+def split_img(file_path, value):
+
+    json_Path = file_path.rsplit('/', 1)
+    name = json_Path[-1].split('.')[0]
+    #   解压
+    share.unzip_file(str(Path(file_path)), str(Path(json_Path[0])))
+
+    jsonPath = str(Path(json_Path[0]) / (name + "/"))
+    print(jsonPath)
+    split_img = os.path.dirname(os.getcwd()) + '/split_img'
+    print(split_img)
+    sonjsonpath = split_img + '/json/'
+    splitimg = split_img + '/img/'
+
+    #   切分
+    json_Name = os.listdir(jsonPath)
+    for name in json_Name:
+        if 'json' in name:
+            split___ = str(name).split(".")[0]
+            splitLabel(split___, jsonPath, sonjsonpath, value, splitimg)
+
+    #   压缩
+    zip_dir = str(Path(share.zipDir(split_img)))
+
+    share.delect_path(str(Path(jsonPath)))
+    share.delect_path(str(Path(file_path)))
+    share.delect_path(str(Path(split_img)))
+    return zip_dir
+
+
 if __name__ == '__main__':
+    share.delect_path(r'C:\Users\dangc\Pictures\模块2标注json.zip')
+    # print(os.path.dirname(os.getcwd()))
+    # share.unzip_file(r'D:\python_project\data_show\upload\json\模块2标注json.zip',r'D:\python_project\data_show\upload\json')
+    #split_img(os.path.dirname(os.getcwd()) + '/upload/json/模块2标注json.zip', '公式')
+
+    # share.delect_path(r'D:\python_project\data_show\upload\屏幕截图2021-04-20101752.json')
+
+    '''path = Path(r'D:\python_project\data_show\\upload\split_img.zip')
+    a = os.path.dirname(__file__) + '/upload/jspon.json'
+    print(a.split('/')[-1].split('.')[0])
+    print(type(path))'''
+    #   share.unzip_file(r'D:\python_project\data_show\upload\split_img.zip', r'D:\python_project\data_show\upload')
+    # share.zipDir(os.path.dirname(os.getcwd()) + '/upload/split_img')
+
+    '''path = os.path.dirname(os.getcwd()) + '/upload/json/'
+    data_folder = Path(path)
+    file_to_open = data_folder / ("a"+'.json')
+    print(type(file_to_open))
+    if not os.path.exists(path[:-1]):
+        os.makedirs(path)'''
+
     # print(ES().a())
-    get_id = ES().get_id('original_data', '001f2ac4-c509-11eb-b30c-9c2976e90c1f')
-    print(get_id['_source']['original_json']['imageData'])
+    '''get_id = ES().get_id('original_data', '001f2ac4-c509-11eb-b30c-9c2976e90c1f')
+    print(get_id['_source']['original_json']['imageData'])'''
     '''term = ES().term()
     print(term[0])
     ss = {'question_types': '你', 'subject_quality': None, 'topic_hierarchy': None, 'is_answer': None,

@@ -6,10 +6,11 @@ from flask_cors import *
 import os
 from utils import tool
 import json
+from fileapp import file_bp
 
 app = Flask(__name__)
 es = ES()
-
+app.register_blueprint(file_bp,url_prefix='/file')
 
 @app.route('/match/')
 def match_all():
